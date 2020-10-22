@@ -1,0 +1,97 @@
+#include <stdio.h>
+#include <stdlib.h>
+#include <limits.h>
+struct node{
+int data;
+struct node* parent;
+struct node* left;
+struct node* right;
+};
+struct node* new(int dat,struct node* parent)
+{
+struct node *temp;
+temp = malloc(sizeof(struct node));
+temp->data = dat;
+temp->left = NULL;
+temp->right= NULL;
+temp->parent=parent;
+return temp;
+}
+struct node* insert(struct node* n,int dat,struct node* parent)
+{
+if(n==NULL)
+{
+return new(dat,parent);
+}
+else if(n->data<dat)
+{
+n->right=insert(n->right,dat,n);
+}
+else
+n->left=insert(n->left,dat,n);
+return n;
+}
+struct sol{
+int n;
+int a[100];
+};
+struct sol solu={INT_MAX};
+void path(struct node* n, int i)
+{
+int j=0;
+if(solu.n>i-1)
+{
+while(j<i && n!=NULL)
+{
+solu.a[j]=n->data;
+//printf("%d ",n->data);
+n=n->parent;
+j++;
+}
+solu.n=i-1;
+}
+//printf("\n");
+}
+void add(struct node* n,int k,int sum,int lev)
+{
+if(n!=NULL)
+{
+sum+=n->data;
+//printf("Sum is %d\n",sum);
+if(sum==k)
+{
+path(n,lev);
+}
+if(sum<k)
+{
+if(n->left!=NULL && n->left->data<=k)
+add(n->left,k,sum,lev+1);
+if(n->right!=NULL && n->right->data<=k)
+add(n->right,k,sum,lev+1);
+}
+else
+{
+return;
+}
+}
+}
+int main()
+{
+int n,k,x;
+printf("Number of elements: ");
+scanf("%d",&n);
+printf("Sum: ");
+scanf("%d",&k);
+printf("Enter elements:\n");
+scanf("%d",&x);
+struct node* root = new(x,NULL);
+for(int i=1;i<n;++i)
+{
+scanf("%d",&x);
+insert(root,x,NULL);
+}
+add(root,k,0,1);
+for(int i=solu.n;i>=0;--i)
+printf("%d ",solu.a[i]);
+return 0;
+}
