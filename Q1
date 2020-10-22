@@ -1,0 +1,213 @@
+#include <stdio.h>
+#include<stdlib.h>
+struct node
+{
+int data,add;
+struct node* right;
+struct node* left;
+};
+struct node* new(int dat,int add)
+{
+struct node *temp;
+temp = malloc(sizeof(struct node));
+temp->data = dat;
+temp->left = NULL;
+temp->right= NULL;
+temp->add=add;
+return temp;
+}
+struct node* insert(struct node* n,int dat,int add)
+{
+if(n==NULL)
+{
+return new(dat,add);
+}
+else if(n->data<dat)
+{
+n->right=insert(n->right,dat,add);
+}
+else
+n->left=insert(n->left,dat,add);
+return n;
+}
+void inorder(struct node* n)
+{
+if(n!=NULL)
+{
+inorder(n->left);
+printf("%d ",n->data);
+inorder(n->right);
+}
+}
+int search(struct node* n,int x)
+{
+if(n==NULL)
+{
+printf("Element not found");
+return -1;
+}
+if(n->data==x)
+{
+printf("Found at address: %d",n->add);
+return 1;
+}
+else if(n->data<x)
+return search(n->right,x);
+else
+return search(n->left,x);
+}
+int predsuc(struct node* n,int x)
+{
+if(n==NULL)
+{
+printf("Element not found");
+return -1;
+}
+if(n->data==x)
+{
+if(n->left!=NULL)
+{
+struct node* temp=n->left;
+while(temp->right!=NULL)
+{
+temp=temp->right;
+}
+printf("Predecessor is %d\n",temp->data);
+}
+if(n->right!=NULL)
+{
+struct node* temp=n->right;
+while(temp->left!=NULL)
+{
+temp=temp->left;
+}
+printf("Successor is %d\n",temp->data);
+}
+return 1;
+}
+else if(n->data<x)
+{
+int f= predsuc(n->right,x);
+if(f==1)
+{
+printf("Parent node: %d",n->data);
+f=0;
+}
+return f;
+}
+else
+{
+int f= predsuc(n->left,x);
+if(f==1)
+{
+printf("Parent node: %d",n->data);
+f=0;
+}
+return f;
+}
+}
+int depth(struct node* n)
+{
+if(n!=NULL)
+{
+int r=depth(n->right);
+int l=depth(n->left);
+if(l<r)
+return(r+1);
+else
+return(l+1);
+}
+else
+return 0;
+}
+void printlev(struct node* n, int d)
+{
+if(n==NULL)
+return;
+if(d==1)
+printf("%d ",n->data);
+else if(d>1)
+{
+printlev(n->left,d-1);
+printlev(n->right,d-1);
+}
+}
+void level(struct node * n)
+{
+int d=depth(n);
+for(int i=1;i<=d;++i)
+{
+printlev(n,i);
+printf("\n");
+}
+}
+struct node* deleteNode(struct node* node, int data)
+{
+if (node == NULL)
+return node;
+if (node->data > data) {
+node->left = deleteNode(node->left, data);
+return node;
+}
+else if (node->data < data) {
+node->right = deleteNode(node->right, data);
+return node;
+}
+if (node->left == NULL) {
+struct node* temp = node->right;
+free(node);
+return temp;
+}
+else if (node->right == NULL) {
+struct node* temp = node->left;
+free(node);
+return temp;
+}
+else
+{
+struct node* temp = node;
+struct node *temp1 = node->right;
+while (temp1->left != NULL)
+{
+temp = temp1;
+temp1 = temp1->left;
+}
+if (temp != node)
+temp->left = temp1->right;
+else
+temp->right = temp1->right;
+node->data = temp1->data;
+free(temp1);
+return node;
+}
+}
+int main()
+{
+int n,d;
+printf("Enter number of elements: ");
+scanf("%d",&n);
+scanf("%d",&d);
+struct node* root=new(d,0);
+for(int i=0;i<n-1;++i)
+{
+scanf("%d",&d);
+insert(root,d,i+1);
+}
+printf("Ascending order (Inorder:)\n");
+inorder(root);
+printf("\n\nSearch for: ");
+scanf("%d",&n);
+search(root,n);
+printf("\n\nLevel order: \n");
+level(root);
+printf("\n\nPredecessor and successor of: ");
+scanf("%d",&n);
+predsuc(root,n);
+printf("\n\nDeleting 40. Level order: \n");
+deleteNode(root,40);
+level(root);
+printf("\n\nDeleting 88. Level order: \n");
+deleteNode(root,88);
+level(root);
+return 0;
+}
